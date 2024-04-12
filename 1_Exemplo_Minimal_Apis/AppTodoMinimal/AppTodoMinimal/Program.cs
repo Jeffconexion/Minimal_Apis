@@ -1,6 +1,7 @@
 using AppTodoMinimal.Config;
 using AppTodoMinimal.Core.Request;
 using AppTodoMinimal.Data;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Net.Mime;
 
@@ -9,10 +10,10 @@ var app = GeneralConfiguration.ConfigureGeneralSettings(args);
 #endregion
 
 #region Endpoints for TODOS
-app.MapGet("v1/get/todos", (DataBaseContext context) =>
+app.MapGet("v1/get/todos", async (DataBaseContext context) =>
 {
 
-    var todos = context.Todos.ToList();
+    var todos = await context.Todos.ToListAsync();
     return Results.Ok(todos);
 
 }).WithOpenApi()
@@ -23,9 +24,9 @@ app.MapGet("v1/get/todos", (DataBaseContext context) =>
 .Produces((int)HttpStatusCode.OK)
 .Produces((int)HttpStatusCode.InternalServerError);
 
-app.MapGet("v1/get/{id}", (DataBaseContext context, Guid id) =>
+app.MapGet("v1/get/{id}", async (DataBaseContext context, Guid id) =>
 {
-    var todo = context.Todos.Find(id);
+    var todo = await context.Todos.FindAsync(id);
 
     if (todo is null)
     {
@@ -43,12 +44,12 @@ app.MapGet("v1/get/{id}", (DataBaseContext context, Guid id) =>
   .Produces((int)HttpStatusCode.NotFound)
   .Produces((int)HttpStatusCode.InternalServerError);
 
-app.MapPost("v1/post/todos", (DataBaseContext context, CreateTodoRequest request) =>
+app.MapPost("v1/post/todos", async (DataBaseContext context, CreateTodoRequest request) =>
 {
     var todo = request.MapTo();
 
-    context.Todos.Add(todo);
-    context.SaveChanges();
+    await context.Todos.AddAsync(todo);
+    await context.SaveChangesAsync();
 
     return Results.Created($"/v1/todos/{todo.Id}", todo);
 
@@ -62,9 +63,9 @@ app.MapPost("v1/post/todos", (DataBaseContext context, CreateTodoRequest request
 .Produces((int)HttpStatusCode.InternalServerError);
 
 
-app.MapPut("v1/put/todos/{id}", (DataBaseContext context, Guid id, Todo newTodo) =>
+app.MapPut("v1/put/todos/{id}", async (DataBaseContext context, Guid id, Todo newTodo) =>
 {
-    var oldTodo = context.Todos.Find(id);
+    var oldTodo = await context.Todos.FindAsync(id);
 
     if (oldTodo is null)
     {
@@ -74,7 +75,7 @@ app.MapPut("v1/put/todos/{id}", (DataBaseContext context, Guid id, Todo newTodo)
     oldTodo.Title = newTodo.Title;
 
     context.Todos.Update(oldTodo);
-    context.SaveChanges();
+    await context.SaveChangesAsync();
 
     return Results.Ok(oldTodo);
 
@@ -87,16 +88,16 @@ app.MapPut("v1/put/todos/{id}", (DataBaseContext context, Guid id, Todo newTodo)
 .Produces((int)HttpStatusCode.NotFound)
 .Produces((int)HttpStatusCode.InternalServerError);
 
-app.MapDelete("v1/delete/todos/{id}", (DataBaseContext context, Guid id) =>
+app.MapDelete("v1/delete/todos/{id}", async (DataBaseContext context, Guid id) =>
 {
-    var todo = context.Todos.Find(id);
+    var todo = await context.Todos.FindAsync(id);
 
     if (todo is null)
     {
         return Results.NotFound();
     }
     context.Todos.Remove(todo);
-    context.SaveChanges();
+    await context.SaveChangesAsync();
 
     return Results.Ok(todo);
 
