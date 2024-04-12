@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AppTodoMinimal.Application\AppTodoMinimal.Application.csproj" />
     <ProjectReference Include="..\AppTodoMinimal.Core\AppTodoMinimal.Core.csproj" />
   </ItemGroup>
 

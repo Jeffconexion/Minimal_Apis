@@ -14,6 +14,10 @@ namespace AppTodoMinimal.Config
             var configServiceSwagger = new ConfigServiceSwagger();
             configServiceSwagger.ConfigureSwagger(builder);
 
+            //injection configuration
+            var configServiceInjeciton = new ConfigServiceInjeciton();
+            configServiceInjeciton.ConfigureInjection(builder);
+
             //database configuration
             var configServiceDatabase = new ConfigServiceDatabase();
             configServiceDatabase.ConfigureDatabase(builder);

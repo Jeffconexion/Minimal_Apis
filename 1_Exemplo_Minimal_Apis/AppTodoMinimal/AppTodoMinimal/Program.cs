@@ -1,6 +1,7 @@
 using AppTodoMinimal.Config;
 using AppTodoMinimal.Core.Request;
 using AppTodoMinimal.Data;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Net.Mime;
@@ -44,8 +45,16 @@ app.MapGet("v1/get/{id}", async (DataBaseContext context, Guid id) =>
   .Produces((int)HttpStatusCode.NotFound)
   .Produces((int)HttpStatusCode.InternalServerError);
 
-app.MapPost("v1/post/todos", async (DataBaseContext context, CreateTodoRequest request) =>
+app.MapPost("v1/post/todos", async (DataBaseContext context,CreateTodoRequest request, IValidator<CreateTodoRequest> validator) =>
 {
+
+    var validation = await validator.ValidateAsync(request);
+
+    if (validation.IsValid is false)
+    {
+        return Results.ValidationProblem(validation.ToDictionary());
+    }
+
     var todo = request.MapTo();
 
     await context.Todos.AddAsync(todo);
