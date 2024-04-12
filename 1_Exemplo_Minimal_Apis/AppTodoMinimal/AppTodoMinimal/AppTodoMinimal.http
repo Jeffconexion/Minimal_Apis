@@ -1,0 +1,6 @@
+@AppTodoMinimal_HostAddress = http://localhost:5076
+
+GET {{AppTodoMinimal_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
