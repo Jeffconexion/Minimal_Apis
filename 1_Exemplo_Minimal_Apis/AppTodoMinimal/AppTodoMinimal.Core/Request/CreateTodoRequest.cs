@@ -4,7 +4,7 @@
     {
         public string Title { get; set; }
         public Todo MapTo()
-        {           
+        {
             return new Todo(Guid.NewGuid(), Title, false);
         }
     }

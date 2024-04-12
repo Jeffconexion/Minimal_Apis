@@ -3,8 +3,8 @@ using AppTodoMinimal.Core.Request;
 using AppTodoMinimal.Data;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System.Net;
-using System.Net.Mime;
 
 #region Configuration builder, swagger end database.
 var app = GeneralConfiguration.ConfigureGeneralSettings(args);
@@ -13,9 +13,21 @@ var app = GeneralConfiguration.ConfigureGeneralSettings(args);
 #region Endpoints for TODOS
 app.MapGet("v1/get/todos", async (DataBaseContext context) =>
 {
-
-    var todos = await context.Todos.ToListAsync();
-    return Results.Ok(todos);
+    try
+    {
+        var todos = await context.Todos.ToListAsync();
+        return Results.Ok(todos);
+    }
+    catch (Exception ex)
+    {
+        Log.Fatal(ex, "Host terminated unexpectedly");
+        return Results.Problem(ex.Message);
+    }
+    finally
+    {
+        Log.Information("Server Shutting down...");
+        Log.CloseAndFlush();
+    }
 
 }).WithOpenApi()
 .WithName("GetToDos")
@@ -27,14 +39,28 @@ app.MapGet("v1/get/todos", async (DataBaseContext context) =>
 
 app.MapGet("v1/get/{id}", async (DataBaseContext context, Guid id) =>
 {
-    var todo = await context.Todos.FindAsync(id);
 
-    if (todo is null)
+    try
     {
-        return Results.NotFound(todo);
-    }
+        var todo = await context.Todos.FindAsync(id);
 
-    return Results.Ok(todo);
+        if (todo is null)
+        {
+            return Results.NotFound(todo);
+        }
+
+        return Results.Ok(todo);
+    }
+    catch (Exception ex)
+    {
+        Log.Fatal(ex, "Host terminated unexpectedly");
+        return Results.Problem(ex.Message);
+    }
+    finally
+    {
+        Log.Information("Server Shutting down...");
+        Log.CloseAndFlush();
+    }
 
 }).WithOpenApi()
   .WithName("GetTodoById")
@@ -45,22 +71,34 @@ app.MapGet("v1/get/{id}", async (DataBaseContext context, Guid id) =>
   .Produces((int)HttpStatusCode.NotFound)
   .Produces((int)HttpStatusCode.InternalServerError);
 
-app.MapPost("v1/post/todos", async (DataBaseContext context,CreateTodoRequest request, IValidator<CreateTodoRequest> validator) =>
+app.MapPost("v1/post/todos", async (DataBaseContext context, CreateTodoRequest request, IValidator<CreateTodoRequest> validator) =>
 {
-
-    var validation = await validator.ValidateAsync(request);
-
-    if (validation.IsValid is false)
+    try
     {
-        return Results.ValidationProblem(validation.ToDictionary());
+        var validation = await validator.ValidateAsync(request);
+
+        if (validation.IsValid is false)
+        {
+            return Results.ValidationProblem(validation.ToDictionary());
+        }
+
+        var todo = request.MapTo();
+
+        await context.Todos.AddAsync(todo);
+        await context.SaveChangesAsync();
+
+        return Results.Created($"/v1/todos/{todo.Id}", todo);
     }
-
-    var todo = request.MapTo();
-
-    await context.Todos.AddAsync(todo);
-    await context.SaveChangesAsync();
-
-    return Results.Created($"/v1/todos/{todo.Id}", todo);
+    catch (Exception ex)
+    {
+        Log.Fatal(ex, "Host terminated unexpectedly");
+        return Results.Problem(ex.Message);
+    }
+    finally
+    {
+        Log.Information("Server Shutting down...");
+        Log.CloseAndFlush();
+    }
 
 }).WithOpenApi()
 .WithName("CreateTodo")
@@ -74,19 +112,32 @@ app.MapPost("v1/post/todos", async (DataBaseContext context,CreateTodoRequest re
 
 app.MapPut("v1/put/todos/{id}", async (DataBaseContext context, Guid id, Todo newTodo) =>
 {
-    var oldTodo = await context.Todos.FindAsync(id);
-
-    if (oldTodo is null)
+    try
     {
-        return Results.NotFound();
+        var oldTodo = await context.Todos.FindAsync(id);
+
+        if (oldTodo is null)
+        {
+            return Results.NotFound();
+        }
+
+        oldTodo.Title = newTodo.Title;
+
+        context.Todos.Update(oldTodo);
+        await context.SaveChangesAsync();
+
+        return Results.Ok(oldTodo);
     }
-
-    oldTodo.Title = newTodo.Title;
-
-    context.Todos.Update(oldTodo);
-    await context.SaveChangesAsync();
-
-    return Results.Ok(oldTodo);
+    catch (Exception ex)
+    {
+        Log.Fatal(ex, "Host terminated unexpectedly");
+        return Results.Problem(ex.Message);
+    }
+    finally
+    {
+        Log.Information("Server Shutting down...");
+        Log.CloseAndFlush();
+    }
 
 }).WithOpenApi()
 .WithName("UpdateTodo")
@@ -99,16 +150,29 @@ app.MapPut("v1/put/todos/{id}", async (DataBaseContext context, Guid id, Todo ne
 
 app.MapDelete("v1/delete/todos/{id}", async (DataBaseContext context, Guid id) =>
 {
-    var todo = await context.Todos.FindAsync(id);
-
-    if (todo is null)
+    try
     {
-        return Results.NotFound();
-    }
-    context.Todos.Remove(todo);
-    await context.SaveChangesAsync();
+        var todo = await context.Todos.FindAsync(id);
 
-    return Results.Ok(todo);
+        if (todo is null)
+        {
+            return Results.NotFound();
+        }
+        context.Todos.Remove(todo);
+        await context.SaveChangesAsync();
+
+        return Results.Ok(todo);
+    }
+    catch (Exception ex)
+    {
+        Log.Fatal(ex, "Host terminated unexpectedly");
+        return Results.Problem(ex.Message);
+    }
+    finally
+    {
+        Log.Information("Server Shutting down...");
+        Log.CloseAndFlush();
+    }
 
 }).WithOpenApi()
 .WithName("DeleteTodo")
