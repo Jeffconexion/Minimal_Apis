@@ -1,8 +1,8 @@
 using AppTodoMinimal.Config;
+using AppTodoMinimal.Core.Request;
 using AppTodoMinimal.Data;
-using AppTodoMinimal.ViewModels;
-using Microsoft.EntityFrameworkCore;
-using Swashbuckle.AspNetCore.Annotations;
+using System.Net;
+using System.Net.Mime;
 
 #region Configuration builder, swagger end database.
 var app = GeneralConfiguration.ConfigureGeneralSettings(args);
@@ -11,14 +11,17 @@ var app = GeneralConfiguration.ConfigureGeneralSettings(args);
 #region Endpoints for TODOS
 app.MapGet("v1/get/todos", (DataBaseContext context) =>
 {
-    //var todos = new Todo(Guid.NewGuid(), "Ir a academia", false);
+
     var todos = context.Todos.ToList();
     return Results.Ok(todos);
+
 }).WithOpenApi()
 .WithName("GetToDos")
 .WithTags("Gets")
 .WithSummary("Get All To dos")
-.WithDescription("Endpoint to retrieve all tasks.");
+.WithDescription("Endpoint to retrieve all tasks.")
+.Produces((int)HttpStatusCode.OK)
+.Produces((int)HttpStatusCode.InternalServerError);
 
 app.MapGet("v1/get/{id}", (DataBaseContext context, Guid id) =>
 {
@@ -30,29 +33,33 @@ app.MapGet("v1/get/{id}", (DataBaseContext context, Guid id) =>
     }
 
     return Results.Ok(todo);
+
 }).WithOpenApi()
   .WithName("GetTodoById")
   .WithTags("Gets")
   .WithSummary("Get a single task")
-  .WithDescription("Users to get the details of a single task based on the provided ID.");
+  .WithDescription("Users to get the details of a single task based on the provided ID.")
+  .Produces((int)HttpStatusCode.OK)
+  .Produces((int)HttpStatusCode.NotFound)
+  .Produces((int)HttpStatusCode.InternalServerError);
 
-app.MapPost("v1/post/todos", (DataBaseContext context, CreateTodoViewModel model) =>
+app.MapPost("v1/post/todos", (DataBaseContext context, CreateTodoRequest request) =>
 {
-    var todo = model.MapTo();
-    if (model.IsValid is false)
-    {
-        return Results.BadRequest(model.Notifications);
-    }
+    var todo = request.MapTo();
 
     context.Todos.Add(todo);
     context.SaveChanges();
 
     return Results.Created($"/v1/todos/{todo.Id}", todo);
+
 }).WithOpenApi()
 .WithName("CreateTodo")
 .WithTags("Posts")
 .WithSummary("Create a new task")
-.WithDescription("Endpoint to create a new task.");
+.WithDescription("Endpoint to create a new task.")
+.Produces((int)HttpStatusCode.OK)
+.Produces((int)HttpStatusCode.NotFound)
+.Produces((int)HttpStatusCode.InternalServerError);
 
 
 app.MapPut("v1/put/todos/{id}", (DataBaseContext context, Guid id, Todo newTodo) =>
@@ -75,7 +82,10 @@ app.MapPut("v1/put/todos/{id}", (DataBaseContext context, Guid id, Todo newTodo)
 .WithName("UpdateTodo")
 .WithTags("Puts")
 .WithSummary("Update a task")
-.WithDescription("Endpoint to update an existing task based on the provided ID.");
+.WithDescription("Endpoint to update an existing task based on the provided ID.")
+.Produces((int)HttpStatusCode.OK)
+.Produces((int)HttpStatusCode.NotFound)
+.Produces((int)HttpStatusCode.InternalServerError);
 
 app.MapDelete("v1/delete/todos/{id}", (DataBaseContext context, Guid id) =>
 {
@@ -94,7 +104,10 @@ app.MapDelete("v1/delete/todos/{id}", (DataBaseContext context, Guid id) =>
 .WithName("DeleteTodo")
 .WithTags("Deletes")
 .WithSummary("Delete a task")
-.WithDescription("Endpoint to delete an existing task based on the provided ID.");
+.WithDescription("Endpoint to delete an existing task based on the provided ID.")
+.Produces((int)HttpStatusCode.OK)
+.Produces((int)HttpStatusCode.NotFound)
+.Produces((int)HttpStatusCode.InternalServerError);
 
 #endregion
 

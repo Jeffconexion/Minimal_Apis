@@ -1,6 +1,4 @@
-﻿using AppTodoMinimal.Data;
-
-namespace AppTodoMinimal.Config.ConfigServices
+﻿namespace AppTodoMinimal.Config.ConfigServices
 {
     public class ConfigServiceDatabase
     {
