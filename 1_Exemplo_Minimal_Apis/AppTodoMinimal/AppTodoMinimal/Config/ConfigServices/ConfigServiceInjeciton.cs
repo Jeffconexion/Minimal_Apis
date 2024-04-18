@@ -1,13 +1,8 @@
-﻿using AppTodoMinimal.Application.Validation;
-using AppTodoMinimal.Core.Extensions;
-using AppTodoMinimal.Core.Request;
-using FluentValidation;
-
-namespace AppTodoMinimal.Config.ConfigServices
+﻿namespace AppTodoMinimal.Config.ConfigServices
 {
-    public class ConfigServiceInjeciton
+    public static class ConfigServiceInjeciton
     {
-        public void ConfigureInjection(WebApplicationBuilder builder)
+        public static void ConfigureInjection(this WebApplicationBuilder builder)
         {
             builder.Services.AddScoped<IValidator<CreateTodoRequest>, CreateTodoValidation>();
             builder.Services.AddSwaggerGen();

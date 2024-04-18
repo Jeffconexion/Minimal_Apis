@@ -1,6 +1,4 @@
-﻿using AppTodoMinimal.Config.ConfigServices;
-
-namespace AppTodoMinimal.Config
+﻿namespace AppTodoMinimal.Config
 {
     public static class GeneralConfiguration
     {
@@ -11,22 +9,19 @@ namespace AppTodoMinimal.Config
             var builder = configApplication.ConfigurationBuilder(args);
 
             //swagger configuration
-            var configServiceSwagger = new ConfigServiceSwagger();
-            configServiceSwagger.ConfigureSwagger(builder);
+            builder.ConfigureSwagger();
 
             //injection configuration
-            var configServiceInjeciton = new ConfigServiceInjeciton();
-            configServiceInjeciton.ConfigureInjection(builder);
+            builder.ConfigureInjection();
 
             //database configuration
-            var configServiceDatabase = new ConfigServiceDatabase();
-            configServiceDatabase.ConfigureDatabase(builder);
+            builder.ConfigureDatabase();
 
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
             {
-                configServiceSwagger.ConfigureSwaggerUse(app);
+                app.ConfigureSwaggerUse();
             }
 
             app.UseHttpsRedirection();

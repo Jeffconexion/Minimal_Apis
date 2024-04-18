@@ -1,10 +1,8 @@
-﻿using AppTodoMinimal.Data;
-
-namespace AppTodoMinimal.Config.ConfigServices
+﻿namespace AppTodoMinimal.Config.ConfigServices
 {
-    public class ConfigServiceSwagger
+    public static class ConfigServiceSwagger
     {
-        public void ConfigureSwagger(WebApplicationBuilder builder)
+        public static void ConfigureSwagger(this WebApplicationBuilder builder)
         {
             builder.Services.AddDbContext<DataBaseContext>();
             builder.Services.AddSwaggerGen(x =>
@@ -12,7 +10,7 @@ namespace AppTodoMinimal.Config.ConfigServices
                 x.EnableAnnotations();
             });
         }
-        public void ConfigureSwaggerUse(WebApplication app)
+        public static void ConfigureSwaggerUse(this WebApplication app)
         {
             app.UseSwagger();
             app.UseSwaggerUI();

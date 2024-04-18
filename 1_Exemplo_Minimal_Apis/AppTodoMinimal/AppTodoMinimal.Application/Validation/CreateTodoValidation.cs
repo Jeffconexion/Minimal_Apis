@@ -1,7 +1,4 @@
-﻿using AppTodoMinimal.Core.Request;
-using FluentValidation;
-
-namespace AppTodoMinimal.Application.Validation
+﻿namespace AppTodoMinimal.Application.Validation
 {
     public class CreateTodoValidation : AbstractValidator<CreateTodoRequest>
     {

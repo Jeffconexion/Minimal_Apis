@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace AppTodoMinimal.Data
+﻿namespace AppTodoMinimal.Data
 {
     public class DataBaseContext : DbContext
     {

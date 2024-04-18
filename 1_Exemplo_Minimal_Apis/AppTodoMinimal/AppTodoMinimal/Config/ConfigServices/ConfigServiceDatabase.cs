@@ -1,8 +1,8 @@
 ﻿namespace AppTodoMinimal.Config.ConfigServices
 {
-    public class ConfigServiceDatabase
+    public static class ConfigServiceDatabase
     {
-        public void ConfigureDatabase(WebApplicationBuilder builder)
+        public static void ConfigureDatabase(this WebApplicationBuilder builder)
         {
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

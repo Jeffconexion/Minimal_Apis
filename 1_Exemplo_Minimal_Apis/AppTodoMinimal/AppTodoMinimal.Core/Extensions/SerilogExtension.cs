@@ -1,13 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Serilog;
-using Serilog.Events;
-using Serilog.Exceptions;
-using Serilog.Filters;
-
-namespace AppTodoMinimal.Core.Extensions
+﻿namespace AppTodoMinimal.Core.Extensions
 {
     public static class SerilogExtension
     {
@@ -24,7 +15,7 @@ namespace AppTodoMinimal.Core.Extensions
                 .Enrich.WithCorrelationId()
                 .Enrich.WithCorrelationIdHeader()
                 .Enrich.WithProperty("ApplicationName", "API Serilog")
-                .WriteTo.Async(wt => wt.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Properties:j}{NewLine}{Exception}", restrictedToMinimumLevel: logLevel))             
+                .WriteTo.Async(wt => wt.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Properties:j}{NewLine}{Exception}", restrictedToMinimumLevel: logLevel))
                 .CreateLogger();
 
             builder.Logging.ClearProviders();
