@@ -17,6 +17,9 @@
             //database configuration
             builder.ConfigureDatabase();
 
+            //CORS configuration
+            builder.ConfigPolicyGeneric();
+
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
