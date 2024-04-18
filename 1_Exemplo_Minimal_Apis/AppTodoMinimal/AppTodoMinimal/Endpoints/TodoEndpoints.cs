@@ -2,9 +2,38 @@
 {
     public static class TodoEndpoints
     {
-        public static void MapTodoEndpoints(this WebApplication app)
+        public static void MapTodoEndpoints(this IEndpointRouteBuilder app)
         {
-            app.MapGet("v1/get/todos", async (DataBaseContext context) =>
+
+
+            app.MapGet("list-all", async (DataBaseContext context) =>
+            {
+                try
+                {
+                    var todos = await context.Todos.ToListAsync();
+                    return Results.Ok(todos);
+                }
+                catch (Exception ex)
+                {
+                    Log.Fatal(ex, "Host terminated unexpectedly");
+                    return Results.Problem(ex.Message);
+                }
+                finally
+                {
+                    Log.Information("Server Shutting down...");
+                    Log.CloseAndFlush();
+                }
+
+            }).WithOpenApi()
+              .WithName("GetToDos Depreciated")
+              .WithTags("Gets")
+              .WithSummary("Get All To dos")
+              .WithDescription("Endpoint to retrieve all tasks.")
+              .Produces((int)HttpStatusCode.OK)
+              .Produces((int)HttpStatusCode.InternalServerError)
+              .MapToApiVersion(1);
+
+            app.MapGet("list-all", async (DataBaseContext context) =>
             {
                 try
                 {
@@ -28,10 +57,11 @@
               .WithSummary("Get All To dos")
               .WithDescription("Endpoint to retrieve all tasks.")
               .Produces((int)HttpStatusCode.OK)
-              .Produces((int)HttpStatusCode.InternalServerError);
+              .Produces((int)HttpStatusCode.InternalServerError)
+              .MapToApiVersion(2);
 
 
-            app.MapGet("v1/get/{id}", async (DataBaseContext context, Guid id) =>
+            app.MapGet("list/{id}", async (DataBaseContext context, Guid id) =>
             {
 
                 try
@@ -63,10 +93,11 @@
               .WithDescription("Users to get the details of a single task based on the provided ID.")
               .Produces((int)HttpStatusCode.OK)
               .Produces((int)HttpStatusCode.NotFound)
-              .Produces((int)HttpStatusCode.InternalServerError);
+              .Produces((int)HttpStatusCode.InternalServerError)
+              .MapToApiVersion(1);
 
 
-            app.MapPost("v1/post/todos", async (DataBaseContext context, CreateTodoRequest request, IValidator<CreateTodoRequest> validator) =>
+            app.MapPost("add-new", async (DataBaseContext context, CreateTodoRequest request, IValidator<CreateTodoRequest> validator) =>
             {
                 try
                 {
@@ -105,7 +136,7 @@
             .Produces((int)HttpStatusCode.InternalServerError);
 
 
-            app.MapPut("v1/put/todos/{id}", async (DataBaseContext context, Guid id, Todo newTodo) =>
+            app.MapPut("update/{id}", async (DataBaseContext context, Guid id, Todo newTodo) =>
             {
                 try
                 {
@@ -144,7 +175,7 @@
             .Produces((int)HttpStatusCode.InternalServerError);
 
 
-            app.MapDelete("v1/delete/todos/{id}", async (DataBaseContext context, Guid id) =>
+            app.MapDelete("remove/{id}", async (DataBaseContext context, Guid id) =>
             {
                 try
                 {

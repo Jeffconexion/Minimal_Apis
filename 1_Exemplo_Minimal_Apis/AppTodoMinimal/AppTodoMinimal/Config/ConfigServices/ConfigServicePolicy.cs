@@ -2,7 +2,7 @@
 {
     public static class ConfigServicePolicy
     {
-        public static void ConfigPolicyGeneric(this WebApplicationBuilder builder)
+        public static void ConfigurePolicyGeneric(this WebApplicationBuilder builder)
         {
             var MyAllowSpecificOrigins = "_app_policy";
             builder.Services.AddCors(op =>

@@ -18,7 +18,10 @@
             builder.ConfigureDatabase();
 
             //CORS configuration
-            builder.ConfigPolicyGeneric();
+            builder.ConfigurePolicyGeneric();
+
+            //Version api configuration
+            builder.ConfigureVersionApi();
 
             var app = builder.Build();
 
